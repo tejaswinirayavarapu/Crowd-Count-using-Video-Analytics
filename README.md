@@ -82,15 +82,7 @@ python app.py
 6. **Access the app**
    Open (http://127.0.0.1:5000) in your browser.
 ## Output Screenshots
-When the dashboard opens, the user can see a Zone Manipulation button in 
-the sidebar. Clicking this button reveals several options: 
- Use Webcam   
- Upload Video   
- Draw Zones   
- Preview Zones
- Track Id
- Edit Zones   
- Delete Zones 
+When the dashboard opens, the user will see a Zone Manipulation button in the sidebar. Clicking this button shows several options: Use Webcam, Upload Video, Draw Zones, Preview Zones, Track ID, Edit Zones, and Delete Zones.
 <img width="1917" height="1004" alt="Screenshot 2025-09-28 162400" src="https://github.com/user-attachments/assets/ab5597ce-85d1-44c9-8fed-319193238590" />
 
 1. Upload Video or Use Webcam   
