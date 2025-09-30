@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .live-grid { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: auto auto; gap: 12px; }
+        .card { background: #0f1b2a; color: #eaf2ff; border-radius: 10px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .alert { background:#2a0f13; color:#ffb3b3; padding:8px 12px; border-radius:8px; display:none; }
+        .kpi { display:flex; justify-content:space-between; margin:6px 0; padding:8px; border-radius:8px; background:#132336; }
+        .thresholds { display:grid; grid-template-columns: 1fr; gap:8px; margin-top:8px; }
+        .thresholds input { width:80px; margin-left:6px; }
+        .kpi-grid { display:grid; grid-template-columns: 1fr; gap:8px; }
+        .no-margin { margin: 0; }
+        .toast { position: fixed; right: 16px; bottom: 16px; background: #102746; color:#cfe2ff; border: 1px solid #1f3b6b; padding: 10px 14px; border-radius: 10px; display: none; box-shadow: 0 8px 22px rgba(0,0,0,0.35); }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const alertBox = document.getElementById('alert-box');
+
+            let evtSrc = null;
+
+            function openSSE() {
+                if (evtSrc) evtSrc.close();
+                evtSrc = new EventSource('/stats_stream');
+                evtSrc.onmessage = (e) => {
+                    const data = JSON.parse(e.data);
+                    updateChartsAndKpis(data.counts, data.thresholds || {});
+                };
+            }
+
+            // Start stream automatically using last uploaded video
+            fetch('/start_stream', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({}) })
+              .then(async (r) => { openSSE(); await primeZonesUI(); })
+              .catch(async () => { openSSE(); await primeZonesUI(); });
+
+            // removed thresholds form (per latest requirement)
+
+            const lineCtx = document.getElementById('lineChart').getContext('2d');
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            const labels = [];
+            const datasetsMap = {};
+            const lineChart = new Chart(lineCtx, { type:'line', data:{ labels, datasets:[] }, options:{ responsive:true, animation:false, plugins:{legend:{display:true}}, scales:{y:{beginAtZero:true}} }});
+            const barChart = new Chart(barCtx, { type:'bubble', data:{ datasets:[] }, options:{ responsive:true, animation:false, plugins:{legend:{display:true}}, scales:{x:{title:{display:true, text:'Time'}, ticks:{display:false}}, y:{type:'category', title:{display:true, text:'Zones'}, labels:[]}} }});
+
+            async function primeZonesUI() {
+                // Build empty tiles for saved zones so UI matches screenshot immediately
+                const res = await fetch('/get_zones');
+                if (!res.ok) return;
+                const zones = await res.json();
+                // fetch saved thresholds to prefill
+                let saved = {};
+                try {
+                    const tr = await fetch('/get_thresholds');
+                    if (tr.ok) saved = await tr.json();
+                } catch {}
+                zones.forEach((z, idx) => {
+                    const name = z.label;
+                    if (!document.getElementById('kpi-' + name)) {
+                        const row = document.createElement('div');
+                        row.className = 'zone-item';
+                        row.id = 'kpi-' + name;
+                        const pref = (typeof saved[name] === 'number') ? saved[name] : '';
+                        row.innerHTML = `<span class="zone-name">${name}</span>
+                                         <span class="zone-badge" id="kpi-val-${name}">0</span>
+                                         <input data-label="${name}" class="form-input" style="width:90px; margin-left:8px;" type="number" min="0" placeholder="limit" value="${pref}">`;
+                        document.getElementById('kpis').appendChild(row);
+                        const color = ['#60a5fa', '#34d399', '#f87171', '#fbbf24', '#a78bfa'][idx % 5];
+                        lineChart.data.datasets.push({ label: name, data: [], borderColor: color });
+                    }
+                });
+                // Render first tick immediately so the chart appears without delay
+                const ts = new Date().toLocaleTimeString();
+                labels.push(ts);
+                lineChart.data.datasets.forEach(ds => ds.data.push(0));
+                lineChart.update('none');
+                barChart.options.scales.y.labels = zones.map(z => z.label);
+                barChart.update('none');
+            }
+
+            function updateChartsAndKpis(counts, thresholds) {
+                const timestamp = new Date().toLocaleTimeString();
+                labels.push(timestamp);
+                if (labels.length > 20) labels.shift();
+
+                // Build full zone list: existing legend labels OR incoming counts (no thresholds UI)
+                const legendZones = lineChart.data.datasets.map(d => d.label);
+                const countZones = Object.keys(counts || {});
+                const zones = Array.from(new Set([ ...legendZones, ...countZones ]));
+                zones.forEach((z, idx) => {
+                    if (!datasetsMap[z]) {
+                        const color = ['#60a5fa', '#34d399', '#f87171', '#fbbf24', '#a78bfa'][idx % 5];
+                        datasetsMap[z] = { label:z, data:[], borderColor:color, backgroundColor:color, borderWidth:2, tension:0.25 };
+                        lineChart.data.datasets.push(datasetsMap[z]);
+                        // KPI row
+                        if (!document.getElementById('kpi-' + z)) {
+                            const row = document.createElement('div');
+                            row.className = 'zone-item';
+                            row.id = 'kpi-' + z;
+                            const pref = (typeof thresholds[z] === 'number') ? thresholds[z] : '';
+                            row.innerHTML = `<span class="zone-name">${z}</span>
+                                             <span class="zone-badge" id="kpi-val-${z}">0</span>
+                                             <input data-label="${z}" class="form-input" style="width:90px; margin-left:8px;" type="number" min="0" placeholder="limit" value="${pref}">`;
+                            document.getElementById('kpis').appendChild(row);
+                        }
+                    }
+                    const series = datasetsMap[z];
+                    const value = (typeof counts[z] === 'number') ? counts[z] : 0;
+                    series.data.push(value);
+                    if (series.data.length > 20) series.data.shift();
+                const badge = document.getElementById('kpi-val-' + z);
+                if (badge) badge.textContent = String(value);
+                });
+                lineChart.update('none');
+                // Bubble heatmap with blue/green/red based on thresholds
+                const zoneList = Object.keys(counts);
+                const timeIndex = labels.length;
+                if (barChart.data.datasets.length === 0) {
+                    barChart.data.datasets = zoneList.map((z) => ({ label: z, data: [] }));
+                    barChart.options.scales.y.labels = zoneList;
+                }
+                // Ensure dataset exists for each zone
+                zoneList.forEach(z => {
+                    if (!barChart.data.datasets.find(ds => ds.label === z)) {
+                        barChart.data.datasets.push({ label: z, data: [] });
+                    }
+                });
+                barChart.data.datasets.forEach(ds => {
+                    const z = ds.label;
+                    const count = counts[z] || 0;
+                    const limit = thresholds[z];
+                    let lowMax, medMax;
+                    if (typeof limit === 'number') { lowMax = Math.max(1, Math.floor(limit*0.6)); medMax = limit; }
+                    else { lowMax = 3; medMax = 6; }
+                    let color = 'rgba(59,130,246,0.7)'; // blue low
+                    if (count > medMax) color = 'rgba(239,68,68,0.7)'; // red high
+                    else if (count > lowMax) color = 'rgba(16,185,129,0.7)'; // green medium
+                    ds.data.push({ x: timeIndex, y: z, r: Math.max(6, count*1.8), backgroundColor: color, borderColor: color });
+                    if (ds.data.length > 20) ds.data.shift();
+                });
+                barChart.update('none');
+
+                // alerts (list all exceeded and reached)
+                const msgs = [];
+                for (const z in counts) {
+                    const limit = thresholds[z];
+                    if (typeof limit === 'number') {
+                        if (counts[z] > limit) msgs.push(`ALERT: '${z}' capacity exceeded (${counts[z]} people)!`);
+                        else if (counts[z] === limit) msgs.push(`Threshold count reached in '${z}'.`);
+                    }
+                }
+                if (msgs.length) {
+                    alertBox.style.display = 'block';
+                    alertBox.innerHTML = msgs.map(m => `<div>${m}</div>`).join('');
+                } else {
+                    alertBox.style.display = 'block';
+                    alertBox.textContent = 'No alerts';
+                }
+
+                // inline save when limit inputs change
+                const kpis = document.getElementById('kpis');
+                if (!kpis._limitHandlerAttached) {
+                    kpis.addEventListener('change', async (e) => {
+                        const inp = e.target;
+                        if (inp && inp.matches('input[data-label]')) {
+                            const payload = {}; payload[inp.dataset.label] = parseInt(inp.value || '0');
+                            await fetch('/set_thresholds', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+                        }
+                    });
+                    kpis._limitHandlerAttached = true;
+                }
+            }
+
+            function showToast(text) {
+                let el = document.getElementById('toast');
+                if (!el) {
+                    el = document.createElement('div');
+                    el.id = 'toast';
+                    el.className = 'toast';
+                    document.body.appendChild(el);
+                }
+                el.textContent = text;
+                el.style.display = 'block';
+                setTimeout(() => { el.style.display = 'none'; }, 1500);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar" style="position:sticky; top:0; align-self:start; height:100vh; display:flex; flex-direction:column;">
+            <div class="sidebar-header">
+                <h2>Live Dashboard</h2>
+                <p>Hello, {{ username }}</p>
+            </div>
+            <nav class="sidebar-nav" style="display:flex; flex-direction:column; height:100%;">
+                <ul style="display:flex; flex-direction:column; gap:12px; flex:1 1 auto; margin:0; padding:0 0 12px 0; list-style:none;">
+                    <li><a href="{{ url_for('dashboard') }}" class="sidebar-btn">Zone Manipulation</a></li>
+                    <li style="margin-top:auto;"><a href="{{ url_for('logout') }}" class="sidebar-btn logout-btn">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Real-time Population Analytics</h1>
+            </header>
+            <div class="content-area live-grid" style="height: calc(100vh - 160px);">
+                <div class="card" style="grid-row: 1 / span 2;">
+                    <h3 class="no-margin">Real-time Population Analytics</h3>
+                    <canvas id="lineChart" height="220"></canvas>
+                </div>
+                <div class="card">
+                    <h3 class="no-margin">Zone Occupancy</h3>
+                    <div id="kpis" class="kpi-grid"></div>
+                </div>
+                <div class="card">
+                    <h3 class="no-margin">Activity Heatmap</h3>
+                    <canvas id="barChart" height="140"></canvas>
+                </div>
+                <div class="card">
+                    <h3 class="no-margin">Alerts</h3>
+                    <div id="alert-box" class="alert" style="display:block;">No alerts</div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+
