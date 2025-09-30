@@ -61,7 +61,7 @@ The solution is applicable to **malls, events, stadiums, transport hubs, or publ
 ### Installation
 
 1. **Clone the repository**
-git clone https://github.com/your-username/crowd-count-video-analytics.git
+git clone [https://github.com/your-username/crowd-count-video-analytics.git](https://github.com/tejaswinirayavarapu/Crowd-Count-using-Video-Analytics)
 cd crowd-count-video-analytics
 
 2. **Create and activate a virtual environment**
