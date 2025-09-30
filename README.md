@@ -87,7 +87,8 @@ the sidebar. Clicking this button reveals several options:
  Use Webcam   
  Upload Video   
  Draw Zones   
- Preview Zones   
+ Preview Zones
+ Track Id
  Edit Zones   
  Delete Zones 
 <img width="1917" height="1004" alt="Screenshot 2025-09-28 162400" src="https://github.com/user-attachments/assets/ab5597ce-85d1-44c9-8fed-319193238590" />
@@ -125,11 +126,7 @@ menu under the Delete Zones option.
 <img width="1918" height="1004" alt="Screenshot 2025-09-28 163040" src="https://github.com/user-attachments/assets/0c524dfb-2a65-48a7-a73e-0d68c955e633" />
 
 7. When the user clicks on the Live Dashboard, they can view: 
- Real-time population counts for each zone 
- Threshold settings to define the maximum allowed count per zone 
- Line chart visualizations showing zone-wise population trends 
- Heatmap overlays on the live video feed to highlight crowded areas 
- An alert system that notifies the user when any zone exceeds its set threshold
+Real-time population counts for each zone, Threshold settings to define the maximum allowed count per zone, Line chart visualizations showing zone-wise population trends, Heatmap overlays on the live video feed to highlight crowded areas, An alert system that notifies the user when any zone exceeds its set threshold.
 <img width="1901" height="1020" alt="Screenshot 2025-09-28 163140" src="https://github.com/user-attachments/assets/92f885b3-f7e9-45db-9c1a-62c2443b7266" />
 
 ## Tech Stack
@@ -139,9 +136,3 @@ menu under the Delete Zones option.
 * **Computer Vision:** OpenCV, YOLO, DeepSORT
 * **Database:** SQLite
 * **Security:** SHA-256, JWT
-
-## Future Scope
-
-* Integration with **live CCTV feeds** for deployment in real-world environments.
-* **Cloud-based dashboards** for centralized monitoring across multiple sites.
-* **Predictive analytics** for crowd flow forecasting and resource planning.
