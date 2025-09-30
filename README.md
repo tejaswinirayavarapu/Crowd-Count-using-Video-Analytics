@@ -1,4 +1,4 @@
-
+## Crowd Count using Video Analytics
 ## Overview
 
 This project is a **smart video analytics system** designed to monitor and manage crowd levels in real time. It combines computer vision, deep learning, and secure user management to deliver a full-stack solution for intelligent crowd monitoring.
