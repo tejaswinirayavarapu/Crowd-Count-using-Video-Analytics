@@ -80,7 +80,7 @@ pip install -r requirements.txt
 python app.py
 
 6. **Access the app**
-   Open (http://localhost:5000) in your browser.
+   Open (http://127.0.0.1:5000) in your browser.
 ## Output Screenshots
 When the dashboard opens, the user can see a Zone Manipulation button in 
 the sidebar. Clicking this button reveals several options: 
