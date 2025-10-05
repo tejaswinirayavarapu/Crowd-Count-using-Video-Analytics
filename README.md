@@ -1,130 +1,123 @@
-## Crowd Count using Video Analytics
+# Crowd Count using Video Analytics
+
 ## Overview
 
-This project is a **smart video analytics system** designed to monitor and manage crowd levels in real time. It combines computer vision, deep learning, and secure user management to deliver a full-stack solution for intelligent crowd monitoring.
+This project is a smart video analytics system designed to monitor and manage crowd levels in real time. It combines computer vision, deep learning, and secure user management to deliver a full-stack solution for intelligent crowd monitoring.
 
 With this system, users can:
 
-* Log in securely with authentication and session management.
-* Upload video streams and define custom monitoring zones.
-* Track and count people in each zone using AI-based detection and tracking.
-* Visualize live crowd data through charts, heatmaps, and video overlays.
-* Receive alerts when a crowd exceeds safe thresholds.
+  * Log in securely with authentication and session management.
+  * Manage a personal user profile with additional details.
+  * Upload video streams and define custom monitoring zones.
+  * Track and count people in each zone using AI-based detection and tracking.
+  * Visualize live crowd data through charts, heatmaps, and video overlays.
+  * Receive alerts when a crowd exceeds safe thresholds.
 
 The solution is applicable to **malls, events, stadiums, transport hubs, or public safety environments** where crowd control is critical.
 
 ## Features
 
-### Secure User Management
+#### Secure User Management & Profiles
 
-* Registration and login system with session handling.
-* Passwords are hashed with **SHA-256** before storage.
-* **JWT-based authentication** for secure and scalable sessions.
+  * **Secure Authentication:** Robust registration and login system for user access.
+  * **User Profile Page:** A dedicated page for users to view their account details (username, email) and manage additional personal information like date of birth, age, place, and gender.
+  * **Password Security:** Passwords are never stored in plain text and are securely hashed.
+  * **Session Management:** JWT-based authentication ensures secure and scalable user sessions.
 
-### Zone Management
+#### Zone Management
 
-* Upload videos and **draw, edit, save, and manage zones**.
-* Zone data and thresholds are persisted in the database.
+  * **Interactive Zone Creation:** Upload videos and **draw, edit, save, and manage zones** directly on the video frame.
+  * **Persistent Storage:** Zone data and custom thresholds are saved in a database for each user.
 
-### Real-Time Analytics
+#### Real-Time Analytics
 
-* **Live Dashboard** with zone-wise crowd counts, updated in real time.
-* **Unique ID Tracking** with **YOLO + DeepSORT** to avoid double counting.
-* **Line Charts** for visualizing population trends.
-* **Heatmap Overlays** highlighting dense areas on the video feed.
-* **Smart Alerts** triggered when thresholds are exceeded.
-
-### Technical Highlights
-
-* **Backend:** Flask with real-time updates.
-* **Frontend:** HTML, CSS, JavaScript (interactive charts & alerts).
-* **Computer Vision:** OpenCV, YOLO for detection, DeepSORT for tracking.
-* **Database:** SQLite for users, zones, thresholds, and logs.
-* **Security:** SHA-256 hashing and JWT session tokens.
+  * **Live Dashboard:** A comprehensive dashboard with zone-wise crowd counts, updated in real time.
+  * **Unique ID Tracking:** Utilizes **YOLO + DeepSORT** to assign persistent IDs to individuals, preventing double counting as they move.
+  * **Data Visualization:** Includes line charts for population trends and heatmap overlays to highlight crowd density on the video feed.
+  * **Smart Alerts:** The system automatically triggers alerts when the number of people in a zone exceeds the user-defined threshold.
 
 ## Project Workflow
 
-1. **User Authentication** – Secure login/registration with hashed passwords & JWT sessions.
-2. **Video Upload & Zone Creation** – Define multiple zones by drawing on uploaded video frames.
-3. **Real-Time Crowd Monitoring** – Live updates with persistent unique IDs per person.
-4. **Visualization Tools** – Line charts, heatmaps, and video overlays with tracked IDs.
-5. **Smart Alerts** – Zone-specific threshold notifications for safety and control.
+1.  **User Onboarding** – New users create an account through a simple registration page. Existing users can log in securely through the login page.
+2.  **Profile Management** – After logging in, users can visit their profile page to view account details and add personal information.
+3.  **Video & Zone Setup** – Users can upload a video or use a webcam feed, then draw custom zones to define monitoring areas.
+4.  **Real-Time Monitoring** – The system tracks individuals with unique IDs, counts them within each zone, and displays the data on a live dashboard.
+5.  **Visualization & Alerts** – Users can monitor trends with charts and heatmaps and receive notifications when a zone's capacity is exceeded.
 
 ## Getting Started
 
-### Prerequisites
+#### Prerequisites
 
-* Python 3.9+
-* pip (Python package manager)
-* Git
+  * Python 3.9+
+  * pip (Python package manager)
+  * Git
 
-### Installation
+#### Installation
 
-1. **Clone the repository**
-git clone  ( https://github.com/tejaswinirayavarapu/Crowd-Count-using-Video-Analytics.git)
-cd crowd-count-video-analytics
+1.  **Clone the repository**
+    git clone https://github.com/tejaswinirayavarapu/Crowd-Count-using-Video-Analytics.git
+    cd Crowd-Count-using-Video-Analytics
+2.  **Create and activate a virtual environment**
+    python -m venv venv
+    *On Windows:*
+    cmd :  venv\Scripts\activate
+    *On Mac/Linux:*
+    source venv/bin/activate
+3.  **Install dependencies**
+    pip install -r requirements.txt
+4.  **Run the application**
+    python app.py
+5.  **Access the app**
+    Open `http://127.0.0.1:5000` in your browser.
 
-2. **Create and activate a virtual environment**
-python -m venv venv
-# On Windows
-venv\Scripts\activate
-# On Mac/Linux
-source venv/bin/activate
 
-3. **Install dependencies**
+## Application Walkthrough
 
-pip install -r requirements.txt
+1.  **Login and Registration**
+    The application starts with a **Login Page**. New users can navigate to the **Registration Page** to create a secure account by providing a username, email, and password.
 
-5. **Run the application**
+2.  **User Profile**
+    After logging in, users can click the **"User Information"** button in the sidebar. This leads to a profile page where they can view their registration details and add or update personal information like date of birth, age, and gender.
+    <img width="1877" height="887" alt="image" src="https://github.com/user-attachments/assets/0e737a97-2a98-40d2-86a0-3edb4524c3f5" />
 
-python app.py
 
-6. **Access the app**
-   Open (http://127.0.0.1:5000) in your browser.
-## Output Screenshots
-When the dashboard opens, the user will see a Zone Manipulation button in the sidebar. Clicking this button shows several options: Use Webcam, Upload Video, Draw Zones, Preview Zones, Track ID, Edit Zones, and Delete Zones.
-<img width="1917" height="1004" alt="Screenshot 2025-09-28 162400" src="https://github.com/user-attachments/assets/ab5597ce-85d1-44c9-8fed-319193238590" />
+3.  **Zone Manipulation Dashboard**
+    The main dashboard features a "Zone Manipulation" menu with several options:
+    <img width="1886" height="881" alt="image" src="https://github.com/user-attachments/assets/151c906c-7e4f-4302-8549-4bd0242e8cc9" />
 
-1. Upload Video or Use Webcam   
- The user can choose either "Use Webcam" or "Upload Video."  
- If Upload Video is selected, the user can pick a video file and click the 
-Upload button. Once uploaded, the video will be displayed on the 
-screen.
-<img width="1918" height="995" alt="Screenshot 2025-09-28 162453" src="https://github.com/user-attachments/assets/773f8ca8-7790-4c0e-91c8-8858befe74ca" />
+      * **Upload Video or Use Webcam:** The user can start by providing a video source.
+      <img width="1863" height="885" alt="image" src="https://github.com/user-attachments/assets/251b6a02-b6fa-4b46-b84b-d8d75f2b9ef5" />
 
-2. Draw Zones 
- After uploading the video, the user can click Draw Zones to mark specific 
-areas on the video.   
- Once zones are drawn, the user can preview them using the Preview 
-Zones option. 
-<img width="1919" height="1022" alt="Screenshot 2025-09-28 162533" src="https://github.com/user-attachments/assets/b75b8ea5-106d-4e68-a168-53c36f732429" />
-<img width="1919" height="992" alt="Screenshot 2025-09-28 162556" src="https://github.com/user-attachments/assets/d0e5341e-ba3b-41c1-9d8c-b83bbd03fc36" />
+      * **Draw Zones:** After a video is loaded, the user can draw rectangular zones over the video to define areas for monitoring.
+      <img width="1899" height="875" alt="image" src="https://github.com/user-attachments/assets/791cafdf-b2cd-4051-9124-c7e3a1a40538" />
+      <img width="1853" height="882" alt="image" src="https://github.com/user-attachments/assets/d447450a-fd99-441c-9717-eb06bd4cffe7" />
 
-3. Preview Zones 
- Users can visualize all zones they have created overlaid on videos.
-<img width="1919" height="1020" alt="Screenshot 2025-09-28 162709" src="https://github.com/user-attachments/assets/784a53b7-d44e-4148-8617-8f6b99c0a99e" />
 
-4. tracking people id
-user can see the people tracking by click on Track id button 
-<img width="1912" height="1020" alt="Screenshot 2025-09-28 162819" src="https://github.com/user-attachments/assets/4ccd1b46-5853-4fbb-a17e-cfde9bc99145" />
+      * **Preview & Track IDs:** Users can preview the zones they've drawn or click "Track ID" to see the live tracking with unique IDs assigned to each person.
+      <img width="1876" height="877" alt="image" src="https://github.com/user-attachments/assets/4976330f-fc6d-4c2b-b901-66fe3426c686" />
+      <img width="1798" height="882" alt="image" src="https://github.com/user-attachments/assets/8d99feb8-2756-4fa3-ab91-d83903189ff4" />
 
-5.Edit Zones 
- The user can then click Edit Zones to rename existing zones or add new names to them. 
- <img width="1919" height="987" alt="Screenshot 2025-09-28 162846" src="https://github.com/user-attachments/assets/e511a27a-44ed-46f4-9ad4-87449189826d" />
 
-6. Delete Zones 
-Specific zones can be deleted by selecting them from a dropdown 
-menu under the Delete Zones option. 
-<img width="1918" height="1004" alt="Screenshot 2025-09-28 163040" src="https://github.com/user-attachments/assets/0c524dfb-2a65-48a7-a73e-0d68c955e633" />
+      * **Edit & Delete Zones:** Existing zones can be renamed or deleted as needed.
+      <img width="1892" height="827" alt="image" src="https://github.com/user-attachments/assets/a0be0477-2f5e-4329-8341-03818c90f5d9" />
+      <img width="1877" height="813" alt="image" src="https://github.com/user-attachments/assets/6a8698e7-35ae-4dfc-8a53-620b03e146fd" />
+      <img width="1872" height="830" alt="image" src="https://github.com/user-attachments/assets/db7397e3-1660-4df9-bbc5-7c51484f280c" />
 
-7. When the user clicks on the Live Dashboard, they can view: 
-Real-time population counts for each zone, Threshold settings to define the maximum allowed count per zone, Line chart visualizations showing zone-wise population trends, Heatmap overlays on the live video feed to highlight crowded areas, An alert system that notifies the user when any zone exceeds its set threshold.
-<img width="1901" height="1020" alt="Screenshot 2025-09-28 163140" src="https://github.com/user-attachments/assets/92f885b3-f7e9-45db-9c1a-62c2443b7266" />
+
+4.  **Live Dashboard**
+    When the user clicks on the "Live Dashboard," they can view:
+
+      * Real-time population counts for each zone.
+      * Line chart visualizations showing population trends over time.
+      * Heatmap overlays on the live video feed to highlight crowded areas.
+      * An alert system that notifies the user when any zone exceeds its set capacity.
+      <img width="1478" height="895" alt="image" src="https://github.com/user-attachments/assets/aa22b692-0dc0-4ad3-99d7-3c1ac328643c" />
+
 
 ## Tech Stack
 
-* **Languages:** Python, JavaScript
-* **Frameworks:** Flask
-* **Computer Vision:** OpenCV, YOLO, DeepSORT
-* **Database:** SQLite
-* **Security:** SHA-256, JWT
+  * **Languages:** Python, JavaScript
+  * **Frameworks:** Flask
+  * **Computer Vision:** OpenCV, YOLO, DeepSORT
+  * **Database:** SQLite
+  * **Security:** Password Hashing, JWT
